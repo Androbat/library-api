@@ -16,3 +16,24 @@ model User {
   username  String
   password String
 }
+
+model Product {
+  id  String @id @default(uuid())
+  name String
+  description String
+  price Float
+  categories Category[]
+}
+
+model Category {
+  id  String @id @default(uuid())
+  name String
+  product Product @relation(fields: [productId], references: [id])
+  productId String
+}
+
+// Check
+model Stock {
+  id String @id @default(uuid())
+  quantity Int 
+}

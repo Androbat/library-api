@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import { createNewUser, updateUser, deleteUser, getUser } from "./repositories/user.repository";
+import { createNewUser, updateUser, deleteUser, getUser } from "./repositories/user-repository/user.repository";
 
 dotenv.config();
 
