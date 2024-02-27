@@ -1,14 +1,14 @@
-import { UserInterface } from "./user.interface";
 import { prisma } from "../../dbconn";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import { isValidEmail } from "../helpers";
 import { Request, Response } from "express";
+import { hashPassword } from "../helpers";
 
 // https://plainenglish.io/blog/typed-express-request-and-response-with-typescript
 // https://dev.to/joshtom/build-a-rest-api-with-prisma-node-js-and-typescript-36o
 
-
+// Test controller
 export async function createNewUser(
   req: Request,
   res: Response
@@ -23,12 +23,14 @@ export async function createNewUser(
       res.json({ error: "Invalid request" });
     }
 
+    console.log(req.body);
+
     if (!isValidEmail(email)) {
       res.status(StatusCodes.BAD_REQUEST);
       res.json({ error: "Invalid email" });
     }
 
-    const passwordHash = await bcrypt.hash(password, salt);
+    const passwordHash = await hashPassword(password, salt);
     const userExist = await prisma.user.findUnique({
       where: {
         email,
@@ -56,21 +58,23 @@ export async function createNewUser(
   }
 }
 
+// Test
 export async function getUser(req: Request, res: Response): Promise<void> {
   try {
-    const email: string = req.body.email;
-    if (!email) {
+    const id = req.params.id;
+    if (!id) {
       res.status(StatusCodes.BAD_REQUEST);
     }
 
     const user = await prisma.user.findUnique({
       where: {
-        email: email,
+        id: id,
       },
     });
 
     if (!user) {
-      res.status(StatusCodes.NOT_FOUND).json({ message: "User not found" });
+      res.status(StatusCodes.NOT_FOUND);
+      res.json({ message: "User not found" });
     }
 
     res.json({ user: user });
@@ -79,19 +83,43 @@ export async function getUser(req: Request, res: Response): Promise<void> {
   }
 }
 
+export async function getUsers(req: Request, res: Response): Promise<void> {
+  try {
+    const users = await prisma.user.findMany();
+    const notEmtpy = users.length === 0;
+    if (!users || notEmtpy) {
+      res.status(StatusCodes.NOT_FOUND);
+      res.json({ error: "Empty users list" });
+    }
+    res.json({ users: users });
+  } catch (error) {
+    res.status(StatusCodes.NOT_FOUND);
+  }
+}
+
+// Test update
 export async function updateUser(req: Request, res: Response) {
   try {
-    const email: string = req.body.email;
+    const id = req.params.id;
+    const username: string = req.body.username;
 
-    if (isValidEmail(email) && email !== undefined) {
+    // Validate the incomind data with a middleware
+    if (!username) {
+      res.status(StatusCodes.BAD_REQUEST);
+      res.json({ error: "Empty data" });
+    }
+
+    if (id) {
       await prisma.user.update({
         where: {
-          email: email,
+          id: id,
         },
         data: {
-          username: req.body.username,
+          username: username,
         },
       });
+
+      res.json({ success: "User successfully updated" });
     } else {
       res.status(StatusCodes.BAD_REQUEST);
     }
@@ -102,15 +130,17 @@ export async function updateUser(req: Request, res: Response) {
 
 export async function deleteUser(req: Request, res: Response): Promise<void> {
   try {
-    const email: string = req.body.email;
-    if (isValidEmail(email) && email !== undefined) {
-      const user = await prisma.user.delete({
-        where: {
-          email: email,
-        },
-      });
-      res.json({ user: user });
+    const id: string = req.params.id;
+
+    if (!id) {
+      res.status(StatusCodes.BAD_REQUEST);
     }
+
+    await prisma.user.delete({
+      where: {
+        id: id,
+      },
+    });
 
     res.status(StatusCodes.OK).json({ message: "User succefully deleted" });
   } catch (error) {
