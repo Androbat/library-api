@@ -1,25 +1,39 @@
 import express, { Express, Request, Response } from "express";
+import { createNewUser } from "./repositories/user-repository/user.repository";
+
 import dotenv from "dotenv";
-import { createNewUser, updateUser, deleteUser, getUser } from "./repositories/user-repository/user.repository";
+import userRouter from "./Routes/user-router/user.router";
+import morgan from "morgan";
 
 dotenv.config();
 
-const app: Express = express();
-const port = process.env.PORT || 3000;
+export const app: Express = express();
+const port = process.env.PORT || 3001;
+
+// Middlewares
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(morgan("dev"));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+/* @User routers */
+app.use("/api/users", userRouter)
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
 
-// Test routers
-app.post('/createNewUser', createNewUser);
-app.get('/user', getUser);
-app.post('/update-user', updateUser);
-app.delete('/delete-user', deleteUser);
+// Create user handler
+app.post("/api/users", createNewUser);
+
+
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
+}
+
+
+
+
+

@@ -11,33 +11,31 @@ datasource db {
 }
 
 model User {
-  id    Int   @id @default(autoincrement()) @unique
+  id    String @id @default(uuid()) 
   email String  @unique
   username  String
   password String
 }
 
 model Product {
-  id  String @id @default(uuid())
+  id  String @id @default(uuid()) 
   name String
   description String
   price Float
-  categoryId String @unique
-  categories  Category @relation(fields: [categoryId], references: [id])
-  stock Stock?
+  categories Category?
+  
 }
 
 model Category {
   id  String @id @default(uuid())
   name String
-  product Product? 
-  productId String @unique
+  product Product @relation(fields: [productId], references: [id])
+  productId String  @default(uuid())  @unique
+
 }
 
 
 model Stock {
   id         String   @id @default(uuid())
-  products    Product  @relation(fields: [productId], references: [id])
   quantity   Int      
-  productId  String @unique
 }
