@@ -47,7 +47,7 @@ export async function createNewUser(
         password: passwordHash,
       },
     });
-
+    // Throwing port already in use. But the port is not being used. Check that error.
     res.status(StatusCodes.OK);
     res.json({ sucess: "User created successfully" });
   } catch (error) {

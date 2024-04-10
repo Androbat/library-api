@@ -8,12 +8,13 @@ export async function createProduct(
   res: Response
 ): Promise<void> {
   try {
-  
-    const categoryId = req.params.categoryId;
-    const { name, description, price } = req.body;
+    
+    const { name, description, price, categoryId } = req.body;
+
     if (!name || !description || !price) {
-      res.status(StatusCodes.BAD_REQUEST);
+      res.status(StatusCodes.BAD_REQUEST)
       res.json({ error: "Invalid Request" });
+      return;
     }
 
     // Using a type I can avoid this validation
@@ -26,67 +27,45 @@ export async function createProduct(
     //   res.status(StatusCodes.BAD_REQUEST);
     //   res.json({ error: "Invalid type of data" });
     // }
-  
 
-
-    if (categoryId) {
-      await prisma.product.create({
-          data: {
-            name: name,
-            description: description,
-            price: price,
-            category: {
-              connect: { id: categoryId }
-            }
-          },
-        });
-      
+    if (!categoryId) {
+      res.status(StatusCodes.BAD_REQUEST)
+      res.json({ message: "You don't have a category. Please created one." });
+      return;
     } else {
+
       await prisma.product.create({
         data: {
           name: name,
           description: description,
           price: price,
+          category: {
+            connect: {
+              id: categoryId
+            }
+          }
         },
-      })
+      });
     }
-    
-    
-    // const productCreated = await prisma.product.create({
-    //   data: {
-    //     name: name,
-    //     description: description,
-    //     price: price,
-    //     category: {
-    //       connect: { id: categoryId }
-    //     }
-    //   },
-    // });
-
-    
-
-   
 
 
-    res.status(StatusCodes.OK);
-    res.json({ message: "Product successfully created" });
+    res.status(StatusCodes.OK).json({ message: "Product successfully created" });
     // console.log(productCreated);
-
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR);
-    res.json({ error: error });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error });
   }
 }
+
 
 export async function getProducts(req: Request, res: Response) {
   try {
     const products = await prisma.product.findMany();
-    if (!products.length){
+    if (!products.length) {
       res.status(StatusCodes.NOT_FOUND);
-      res.json({ message: "You have no products, please create at least one"});
+      res.json({ message: "You have no products, please create at least one" });
     }
 
-    res.json({ products: products});
+    res.json({ products: products });
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR);
     res.json({ error: error });

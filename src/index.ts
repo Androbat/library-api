@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import userRouter from "./Routes/user.router";
 import morgan from "morgan";
 import productRouter from "./Routes/product.router";
+import categoryRouter from "./Routes/category.router";
 
 dotenv.config();
 
@@ -30,6 +31,9 @@ app.use("/api/products", productRouter);
 
 // Create user handler
 app.post("/api/users", createNewUser);
+
+// Category chandler
+app.use("/api/categories", categoryRouter);
 
 
 if (process.env.NODE_ENV !== 'test') {

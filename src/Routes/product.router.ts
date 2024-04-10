@@ -4,7 +4,7 @@ import { Router } from "express";
 const router = Router();
 
 router.get('/', getProducts)
-router.post('/:categoryId?', createProduct);
+router.post('/', createProduct);
 
 
 export default router;
