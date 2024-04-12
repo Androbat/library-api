@@ -5,10 +5,7 @@ import { isValidEmail } from "../helpers";
 import { Request, Response } from "express";
 import { hashPassword } from "../helpers";
 
-// https://plainenglish.io/blog/typed-express-request-and-response-with-typescript
-// https://dev.to/joshtom/build-a-rest-api-with-prisma-node-js-and-typescript-36o
 
-// Test controller
 export async function createNewUser(
   req: Request,
   res: Response
@@ -50,7 +47,7 @@ export async function createNewUser(
         password: passwordHash,
       },
     });
-
+    // Throwing port already in use. But the port is not being used. Check that error.
     res.status(StatusCodes.OK);
     res.json({ sucess: "User created successfully" });
   } catch (error) {

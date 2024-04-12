@@ -2,8 +2,10 @@ import express, { Express, Request, Response } from "express";
 import { createNewUser } from "./repositories/user-repository/user.repository";
 
 import dotenv from "dotenv";
-import userRouter from "./Routes/user-router/user.router";
+import userRouter from "./Routes/user.router";
 import morgan from "morgan";
+import productRouter from "./Routes/product.router";
+import categoryRouter from "./Routes/category.router";
 
 dotenv.config();
 
@@ -20,11 +22,18 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 /* @User routers */
-app.use("/api/users", userRouter)
+app.use("/api/users", userRouter);
+
+
+// Product routers
+app.use("/api/products", productRouter);
 
 
 // Create user handler
 app.post("/api/users", createNewUser);
+
+// Category chandler
+app.use("/api/categories", categoryRouter);
 
 
 if (process.env.NODE_ENV !== 'test') {

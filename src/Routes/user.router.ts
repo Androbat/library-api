@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUser, getUsers, deleteUser, updateUser } from "../../repositories/user-repository/user.repository";
+import { getUser, getUsers, deleteUser, updateUser } from "../repositories/user-repository/user.repository";
 
 const router = Router();
 
