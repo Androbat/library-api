@@ -1,9 +1,10 @@
-import { createProduct, getProducts } from "../repositories/product-repository/product.repository";
+import { createProduct, getProducts, getProductsById } from "../repositories/product-repository/product.repository";
 import { Router } from "express";
 
 const router = Router();
 
-router.get('/', getProducts)
+router.get('/:id', getProductsById);
+router.get('/', getProducts);
 router.post('/', createProduct);
 
 

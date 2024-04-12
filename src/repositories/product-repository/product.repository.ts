@@ -11,29 +11,18 @@ export async function createProduct(
     
     const { name, description, price, categoryId } = req.body;
 
-    if (!name || !description || !price) {
+    if (!name || !description || !price || !categoryId) {
       res.status(StatusCodes.BAD_REQUEST)
       res.json({ error: "Invalid Request" });
       return;
     }
 
-    // Using a type I can avoid this validation
-    // if (
-    //   typeof name !== "string" ||
-    //   typeof description !== "string" ||
-    //   typeof price !== "number" ||
-    //   typeof categoryId !== "string"
-    // ) {
-    //   res.status(StatusCodes.BAD_REQUEST);
-    //   res.json({ error: "Invalid type of data" });
-    // }
-
-    if (!categoryId) {
+    const categoryExist = await prisma.category.findUnique({ where: {id: categoryId}  });
+    if (!categoryExist){
       res.status(StatusCodes.BAD_REQUEST)
       res.json({ message: "You don't have a category. Please created one." });
       return;
     } else {
-
       await prisma.product.create({
         data: {
           name: name,
@@ -48,6 +37,20 @@ export async function createProduct(
       });
     }
 
+    
+
+    // Using a type I can avoid this validation
+    // if (
+    //   typeof name !== "string" ||
+    //   typeof description !== "string" ||
+    //   typeof price !== "number" ||
+    //   typeof categoryId !== "string"
+    // ) {
+    //   res.status(StatusCodes.BAD_REQUEST);
+    //   res.json({ error: "Invalid type of data" });
+    // }
+
+   
 
     res.status(StatusCodes.OK).json({ message: "Product successfully created" });
     // console.log(productCreated);
@@ -57,7 +60,33 @@ export async function createProduct(
 }
 
 
-export async function getProducts(req: Request, res: Response) {
+export async function getProductsById(req: Request, res: Response): Promise<void> {
+  try {
+    const id = req.params.id;
+    if (!id) {
+      res.status(StatusCodes.BAD_REQUEST);
+      res.json({ error : "Invalid request"})
+    }
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!product) {
+      res.status(StatusCodes.NOT_FOUND);
+      res.json({ message: "User not found" });
+    }
+
+    res.json({ user: product });
+  } catch (error) {
+    res.json({ error: error });
+  }
+}
+
+
+export async function getProducts(req: Request, res: Response): Promise<void> {
   try {
     const products = await prisma.product.findMany();
     if (!products.length) {
