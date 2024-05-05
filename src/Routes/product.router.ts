@@ -5,7 +5,9 @@ const router = Router();
 
 router.get('/:id', getProductsById);
 router.get('/', getProducts);
+// router.get('/', filterProducts);
 router.post('/', createProduct);
+
 
 
 export default router;
